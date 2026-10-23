@@ -17,6 +17,6 @@ const Θ             = ((2π/16)*j for j in 0:15)   # 16 possible directions
 const ACTIONS       = polar_to_rectangular(R, Θ)
 const OBS_COST_NEAR = 20.0   # Paper, Sec. 5: "cost of 20 ... if observed by an adjacent sensor"
 const OBS_COST_FAR  = 10.0   # Paper, Sec. 5: "cost 10 ... if the sensor is at the maximum distance"
-const STEP_COST     = 1.0 
+const TIME_STEP_COST     = 0.0 
 
 println("There are ", length(ACTIONS), " actions: ", Tuple.(ACTIONS))

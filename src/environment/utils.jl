@@ -107,12 +107,6 @@ function getting_observed_cost(sensor::Sensor, cell::CartesianIndex{2})
     return costs[idx]
 end
 
-"""Use this function for simulation or debugging ONLY"""
-function add_step_cost!(env::Environment, default_cost::Float64=1.0)
-    env.robot.reward -= default_cost
-    return env
-end
-
 
 """
     sa_index(room, s, a) -> Int
@@ -127,13 +121,13 @@ sa_index(room::Room, cell::CartesianIndex{2}, action::CartesianIndex{2}) =
     sa_index(room, state_index(room, cell), findfirst(==(action), ACTIONS))
 
 
-
+""" Adds the time step cost to the length of the path (as penalty)"""
 function get_move_cost_vector(room::Room)
     cost_vector = zeros(length(room.walls) * length(ACTIONS))   # one entry per (s, a)
     for s in 1:length(room.walls)
         for a in 1:length(ACTIONS)
             i = sa_index(room, s, a)
-            cost_vector[i] = STEP_COST + move_cost(ACTIONS[a])
+            cost_vector[i] = TIME_STEP_COST + move_cost(ACTIONS[a])
         end
     end
     return cost_vector
