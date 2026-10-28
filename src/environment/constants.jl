@@ -12,6 +12,8 @@ const DIRECTIONS    = CartesianIndex{2}[  # CartesianIndex{row, col}
 ]
 const MAX_N_SENSORS = 8
 const RANGE         = 8   # Sensor's coverage (it could be randomise for different sensors, but for now its a const)
+const CONE_Θ        = π / 4 # 90° cone = 45° either side (our choice; the paper doesn't say)
+
 const R             = (sqrt(r) for r in (1, 2, 5))
 const Θ             = ((2π/16)*j for j in 0:15)   # 16 possible directions
 const ACTIONS       = polar_to_rectangular(R, Θ)

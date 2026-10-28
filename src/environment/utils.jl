@@ -85,10 +85,36 @@ function cell_of(room::Room, idx::Int)
 end
 
 
-function is_valid_move(room::Room, cell::CartesianIndex{2}, action::CartesianIndex{2})
-    s′ = cell + action
-    inside = checkbounds(Bool, room.walls, s′)   # destination is on the map
-    return inside && !room.walls[s′]             # ...and not a wall (checked only if inside)
+"""
+    line_of_sight(room, from, to) -> Bool
+
+`true` if no wall lies on the straight line between `from` and `to`.
+"""
+function line_of_sight(room::Room, from::CartesianIndex{2}, to::CartesianIndex{2})
+    d = Tuple(to - from)
+    n = ceil(Int, 2 * hypot(d...))             # enough steps not to skip a cell
+    for k in 1:n-1
+        p    = round.(Int, (k / n) .* d)       # point k/n of the way, rounded to a cell
+        cell = from + CartesianIndex(p...)
+        room.walls[cell] && return false       # a wall blocks the view
+    end
+    return true
+end
+
+
+function is_visible(room::Room, sensor::Sensor, cell::CartesianIndex{2})
+    d = cell - sensor.position
+    d == CartesianIndex(0, 0) && return false                   # 1. not the sensor's own cell
+
+    v    = collect(Tuple(d))
+    dist = norm(v)
+    dist > sensor.range && return false                         # 2. close enough
+
+    f = collect(Tuple(DIRECTIONS[sensor.direction]))
+    cosθ = dot(v, f) / (dist * norm(f))
+    cosθ < cos(CONE_Θ) - 1e-9 && return false                   # 3. inside the cone
+
+    return line_of_sight(room, sensor.position, cell)           # 4. no wall in the way
 end
 
 ######## Cost computation ########
@@ -99,12 +125,12 @@ function move_cost(action::CartesianIndex{2})
     return r
 end
 
-function getting_observed_cost(sensor::Sensor, cell::CartesianIndex{2})
-    covered_cells = [sensor.position + r * DIRECTIONS[sensor.direction] for r in 1:sensor.range]
-    idx = findfirst(==(cell), covered_cells)     # step along the beam, or nothing
-    idx === nothing && return 0.0                # not watched → no extra cost
-    costs = range(OBS_COST_NEAR, OBS_COST_FAR; length=sensor.range)
-    return costs[idx]
+function getting_observed_cost(room::Room, sensor::Sensor, cell::CartesianIndex{2})
+    is_visible(room, sensor, cell) || return 0.0              # not watched → no extra cost
+    sensor.range == 1 && return OBS_COST_NEAR                 # avoid dividing by zero
+    dist = hypot(Tuple(cell - sensor.position)...)
+    t    = (dist - 1) / (sensor.range - 1)                    # 0 when adjacent, 1 at max range
+    return OBS_COST_NEAR - t * (OBS_COST_NEAR - OBS_COST_FAR)
 end
 
 
@@ -139,6 +165,7 @@ function cost_vector(room::Room, sensor::Sensor)
     for s in 1:length(room.walls)
         for a in 1:length(ACTIONS)
             if !is_valid_move(room, cell_of(room, s), ACTIONS[a])
+                println("Agent performed invalid move.")
                 continue
             end
             s′ = cell_of(room, s) + ACTIONS[a]      # the cell the robot moves into
