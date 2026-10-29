@@ -13,10 +13,10 @@ include("types.jl")
 include("constants.jl")
 include("environment/room.jl")
 include("environment/costs.jl")
-include("environment/sensors.jl")
 include("environment/dynamics.jl")
 include("environment/render.jl")
 
+include("players/sensors.jl")
 include("players/robot.jl")
 include("players/adversary.jl")
 

@@ -1,9 +1,3 @@
-function is_visible(room::Room, sensor::Sensor, cell::CartesianIndex{2})
-    f    = DIRECTIONS[sensor.direction]
-    beam = [sensor.position + k * f for k in 1:sensor.range]     # every cell on the line
-    return cell in beam
-end
-
 """Print the room as text: '#' wall, `.` free, ⬚ watched, `s` start, g goal, σ sensor."""
 function print_room(room::Room, sensors::Vector{Sensor})
     # Step 1: turn each Bool into a Char

@@ -35,12 +35,11 @@ function cost_vector(room::Room, sensor::Sensor)
     for s in 1:length(room.walls)
         for a in 1:length(ACTIONS)
             if !is_valid_move(room, cell_of(room, s), ACTIONS[a])
-                println("Agent performed invalid move.")
                 continue
             end
             s′ = cell_of(room, s) + ACTIONS[a]      # the cell the robot moves into
             i = sa_index(room, s, a)
-            cost_vector[i] = getting_observed_cost(sensor, s′)
+            cost_vector[i] = getting_observed_cost(room, sensor, s′)
         end
     end
     return cost_vector

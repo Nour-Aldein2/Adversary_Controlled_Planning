@@ -25,7 +25,7 @@ sensors = random_sensors(rng, room, 8, 10)
 function random_sensors(rng::AbstractRNG, room::Room, n::Int, range::Int)
     free_cells = findall(!, room.walls)          # every non-wall cell
     positions  = shuffle(rng, free_cells)[1:n]   # n distinct random cells
-    return [Sensor(p, rand(rng, 1:MAX_N_SENSORS), range) for p in positions]
+    return [Sensor(p, rand(rng, 1:length(DIRECTIONS)), range) for p in positions]
 end
 
 """
@@ -51,7 +51,8 @@ function is_visible(room::Room, sensor::Sensor, cell::CartesianIndex{2})
 
     v    = collect(Tuple(d))
     dist = norm(v)
-    dist > sensor.range && return false                         # 2. close enough
+    layer = maximum(abs, v)                                     # grid distance: which layer of cells
+    layer > sensor.range && return false                        # 2. close enough
 
     f = collect(Tuple(DIRECTIONS[sensor.direction]))
     cosθ = dot(v, f) / (dist * norm(f))
@@ -63,7 +64,7 @@ end
 function getting_observed_cost(room::Room, sensor::Sensor, cell::CartesianIndex{2})
     is_visible(room, sensor, cell) || return 0.0              # not watched → no extra cost
     sensor.range == 1 && return OBS_COST_NEAR                 # avoid dividing by zero
-    dist = hypot(Tuple(cell - sensor.position)...)
-    t    = (dist - 1) / (sensor.range - 1)                    # 0 when adjacent, 1 at max range
+    layer = maximum(abs, Tuple(cell - sensor.position))       # same distance as in is_visible
+    t     = (layer - 1) / (sensor.range - 1)                  # 0 when adjacent, 1 at max range
     return OBS_COST_NEAR - t * (OBS_COST_NEAR - OBS_COST_FAR)
 end

@@ -8,6 +8,7 @@ function state_index(room::Room, cell::CartesianIndex{2})
     return indices[cell]
 end
 
+
 """
     state_index(room, r, c) -> Int
 
@@ -25,6 +26,20 @@ function cell_of(room::Room, idx::Int)
     cell = CartesianIndices(room.walls)[idx]
     return cell
 end
+
+
+"""
+    is_valid_move(room, cell, action) -> Bool
+
+`true` if the robot can move from `cell` by `action`.
+"""
+function is_valid_move(room::Room, cell::CartesianIndex{2}, action::CartesianIndex{2})
+    s′ = cell + action
+    inside = checkbounds(Bool, room.walls, s′)   # destination is on the map
+    return inside && !room.walls[s′] &&          # ...and not a wall (checked only if inside)
+           line_of_sight(room, cell, s′)         # ...and the move doesn't cross a wall
+end
+
 
 ### Prepare room for the agents ###
 function create_random_room(rng::AbstractRNG, h::Int, w::Int,
