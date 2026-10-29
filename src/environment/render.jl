@@ -4,7 +4,7 @@ function is_visible(room::Room, sensor::Sensor, cell::CartesianIndex{2})
     return cell in beam
 end
 
-"""Print the room as text: '#' wall, `.` free, ⬚ watched, `s` start, g goal, s sensor."""
+"""Print the room as text: '#' wall, `.` free, ⬚ watched, `s` start, g goal, σ sensor."""
 function print_room(room::Room, sensors::Vector{Sensor})
     # Step 1: turn each Bool into a Char
     grid = map(w -> w ? '#' : '.', room.walls)
@@ -22,7 +22,7 @@ function print_room(room::Room, sensors::Vector{Sensor})
         grid[g] = 'g'
     end
     for s in sensors
-        grid[s.position] = 's'
+        grid[s.position] = 'σ'
     end
 
     # Step 3: print one row per line
