@@ -4,7 +4,7 @@ function is_visible(room::Room, sensor::Sensor, cell::CartesianIndex{2})
     return cell in beam
 end
 
-"""Print the room as text: '#' wall, `.` free, ⬚ watched, `s` start, 🏁 goal, 👁 sensor."""
+"""Print the room as text: '#' wall, `.` free, ⬚ watched, `s` start, g goal, s sensor."""
 function print_room(room::Room, sensors::Vector{Sensor})
     # Step 1: turn each Bool into a Char
     grid = map(w -> w ? '#' : '.', room.walls)
@@ -19,10 +19,10 @@ function print_room(room::Room, sensors::Vector{Sensor})
     # Step 2: mark special cells (a CartesianIndex works directly as an index)
     grid[room.start] = 's'
     for g in room.goals
-        grid[g] = '🏁'
+        grid[g] = 'g'
     end
     for s in sensors
-        grid[s.position] = '👁'
+        grid[s.position] = 's'
     end
 
     # Step 3: print one row per line

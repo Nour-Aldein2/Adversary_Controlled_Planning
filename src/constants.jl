@@ -1,3 +1,28 @@
+function polar_to_rectangular(rs, θs)
+    possible_actions = CartesianIndex{2}[]
+
+    for r in rs
+        for θ in θs
+            x, y = r*cos(θ), r*sin(θ)
+            xi, yi = round(Int, x), round(Int, y)
+
+            d = hypot(xi, yi)
+
+            if isapprox(d, r, atol=1e-10)
+                action = CartesianIndex(-yi, xi)   # (x, y) → (row, col): up is −row
+
+                if action ∉ possible_actions
+                    push!(possible_actions, action)
+                    @printf("New action (r, θ) → (x, y): (%.3f, %.3f) → (%.0f, %.0f)\n", r, θ, x, y)
+                end
+            end
+        end
+    end
+    return possible_actions
+end
+
+
+
 const MAP_HEIGHT    = 100
 const MAP_WIDTH     = 100
 const DIRECTIONS    = CartesianIndex{2}[  # CartesianIndex{row, col}
