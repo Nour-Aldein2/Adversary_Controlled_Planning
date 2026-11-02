@@ -1,7 +1,12 @@
 # Paper, Sec. 4: "the pure strategies for the opponent are the elements of K"
 # One sensor = one cost vector cⱼ = m + oⱼ
 
-# TODO 2: Adversary(room, sensors)  -> builds m and O
+"""
+    Adversary(room, sensors) -> Adversary
+
+Build the adversary's strategy set: one cost vector per sensor.
+(Outer constructor: a function with the type's name that computes `m` and `O`.)
+"""
 function Adversary(room::Room, sensors::Vector{Sensor})
     """In Julia, a constructor is just a function with the type’s name."""
     m = get_move_cost_vector(room)
@@ -14,7 +19,6 @@ function Adversary(room::Room, sensors::Vector{Sensor})
     return Adversary(sensors, m, O)
 end
 
-# TODO 3: column(adv, j)            -> cⱼ
 
 """
     pure_cost(adv, j) -> Vector{Float64}
@@ -27,7 +31,6 @@ function pure_cost(adv::Adversary, j::Int)
     return cj
 end
 
-# TODO 4: mixed_cost(adv, q)        -> Cq   (Sec. 4.1: "c = Cqᵢ")
 
 """
     mixed_cost(adv, q) -> Vector{Float64}
@@ -35,14 +38,14 @@ end
 Expected cost vector Cq = m + Oq when the adversary mixes over its sensors
 with probabilities `q` (its mixed strategy). Paper, Sec. 4.1: "c = Cqᵢ".
 """
-function mixed_cost(adv::Adversary, q::Vector{Float64})
+function mixed_cost(adv::Adversary, q::AbstractVector{<:Real})
     @assert sum(q) ≈ 1
 
     Cq = adv.m + adv.O * q
     return Cq
 end
 
-# TODO 5: best_response(adv, f̄)     -> (j, v)   (Sec. 4.2: "C(p) = c")   
+
 """
     best_response(adv, f̄) -> (j, v)
 

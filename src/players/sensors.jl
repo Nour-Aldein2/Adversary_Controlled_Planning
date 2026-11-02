@@ -28,6 +28,21 @@ function random_sensors(rng::AbstractRNG, room::Room, n::Int, range::Int)
     return [Sensor(p, rand(rng, 1:length(DIRECTIONS)), range) for p in positions]
 end
 
+
+"""
+    sensor_placements(rng, room, n, range) -> Vector{Sensor}
+
+Pick 'n' distinct random free cells and put a sensor at each one facing every
+direction in `DIRECTIONS`, giving `n × 8` sensors. Paper, Fig. 1: "one of 4
+locations (x), facing one of 8 directions".
+"""
+function sensor_placements(rng::AbstractRNG, room::Room, n::Int, range::Int)
+    free_cells  = findall(!, room.walls)        # Every non-wall cell
+    positions   = shuffle(rng, free_cells)[1:n] # n distinct random cells
+    return [Sensor(p, d, range) for p in positions for d in 1:length(DIRECTIONS)]
+end
+
+
 """
     line_of_sight(room, from, to) -> Bool
 
