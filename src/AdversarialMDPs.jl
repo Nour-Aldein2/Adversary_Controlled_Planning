@@ -7,6 +7,7 @@ using Printf
 
 export Room, Sensor, DIRECTIONS, ACTIONS
 export random_sensors, create_random_room, print_room, get_move_cost_vector, cost_vector
+export Adversary, pure_cost, mixed_cost, best_response
 
 
 include("types.jl")

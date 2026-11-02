@@ -31,3 +31,10 @@ mutable struct Environment
     robot::Robot
     adversary::Vector{Sensor}
 end
+
+struct Adversary
+    sensors::Vector{Sensor}             # sensors[j] is pure strategy j
+    m::Vector{Float64}                  # movement cost for every (s, a), the same for every column
+    O::SparseMatrixCSC{Float64, Int}    # observation cost: column j belongs to sensors[j]
+    # the reason why m is a Vector whereas O is a matrix is that each column in O corresponds to a sensor, since each sensor will have its unique observation cost vector, whereas the moving cost is the same for all sensors since they are environment related (rather than being related to the adversary)
+end
